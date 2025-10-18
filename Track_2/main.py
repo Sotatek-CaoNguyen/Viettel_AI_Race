@@ -10,18 +10,18 @@ from typing import Dict, Iterable, List, Sequence
 import pandas as pd
 from tqdm import tqdm
 
-from .extraction.formula_extractor import extract_formulas
-from .extraction.table_extractor import extract_tables
-from .extraction.text_extractor import extract_paragraphs
-from .postprocessing.markdown_converter import to_markdown
-from .postprocessing.validator import validate
-from .preprocessing.pdf_loader import load_pdf_paths, open_pdf
-from .qa.answer_selector import select_answers
-from .qa.indexer import VectorIndex, build_index
-from .qa.question_parser import parse_questions
-from .qa.retriever import retrieve
-from .utils.file_handler import ensure_dir, read_text, write_text
-from .utils.logger import configure_logging
+from extraction.formula_extractor import extract_formulas
+from extraction.table_extractor import extract_tables
+from extraction.text_extractor import extract_paragraphs
+from postprocessing.markdown_converter import to_markdown
+from postprocessing.validator import validate
+from preprocessing.pdf_loader import load_pdf_paths, open_pdf
+from qa.answer_selector import select_answers
+from qa.indexer import VectorIndex, build_index
+from qa.question_parser import parse_questions
+from qa.retriever import retrieve
+from utils.file_handler import ensure_dir, read_text, write_text
+from utils.logger import configure_logging
 
 
 @dataclass

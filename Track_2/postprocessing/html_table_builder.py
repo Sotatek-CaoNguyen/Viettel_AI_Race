@@ -4,7 +4,7 @@ from __future__ import annotations
 import html
 from typing import Dict, Iterable, List
 
-from ..extraction.merge_cell_handler import reconcile_merged_cells
+from extraction.merge_cell_handler import reconcile_merged_cells
 
 
 def _escape_row(row: Iterable[str]) -> List[str]:
