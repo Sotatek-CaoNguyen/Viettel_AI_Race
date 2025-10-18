@@ -1,0 +1,11 @@
+# Placeholder configuration for the extraction pipeline.
+preprocessing:
+  watermark_removal: true
+  page_segmentation: adaptive
+extraction:
+  table_detector: table_transformer_base
+  text_recognizer: trocr_small
+  layout_parser: layoutlmv3_base
+outputs:
+  markdown_dir: data/processed/markdown
+  assets_dir: data/processed/assets

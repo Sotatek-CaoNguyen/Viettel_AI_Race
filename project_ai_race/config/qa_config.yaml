@@ -1,0 +1,11 @@
+# Placeholder configuration for the QA subsystem.
+retrieval:
+  embedding_model: bge_small
+  index_backend: faiss
+  top_k: 5
+answer_selection:
+  model_name: deberta_v3_small
+  threshold: 0.65
+data:
+  questions_csv: data/questions/questions.csv
+  answers_output: data/answers/answers.md
