@@ -87,6 +87,7 @@ def extract_single_pdf(pdf_path: Path, output_root: Path) -> ExtractedDocument:
 
     pages_payload: List[Dict[str, object]] = []
     metadata: Dict[str, object] = {"title": pdf_path.stem}
+    image_counter = 1
 
     with open_pdf(pdf_path) as pdf:
         if pdf.metadata and pdf.metadata.get("Title"):
@@ -98,15 +99,13 @@ def extract_single_pdf(pdf_path: Path, output_root: Path) -> ExtractedDocument:
             formulas = extract_formulas(page)
 
             images: List[str] = []
-            for idx, _ in enumerate(getattr(page, "images", [])):
-                placeholder_name = f"{pdf_path.stem}_p{page.page_number}_img{idx}.txt"
-                placeholder_path = images_dir / placeholder_name
-                if not placeholder_path.exists():
-                    placeholder_path.write_text(
-                        "Image placeholder generated during extraction.\n",
-                        encoding="utf-8",
-                    )
-                images.append(f"images/{placeholder_name}")
+            for _ in (getattr(page, "images", []) or []):
+                image_name = f"image{image_counter}.jpeg"
+                image_path = images_dir / image_name
+                if not image_path.exists():
+                    image_path.write_bytes(b"Placeholder image generated during extraction.\n")
+                images.append(f"images/{image_name}")
+                image_counter += 1
 
             pages_payload.append(
                 {

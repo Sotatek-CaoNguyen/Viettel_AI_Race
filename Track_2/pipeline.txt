@@ -1,0 +1,383 @@
+import React, { useState } from 'react';
+import { FileText, Database, Search, CheckSquare, Layers, GitBranch, Settings, Folder, PlayCircle } from 'lucide-react';
+
+const PipelineDesign = () => {
+  const [activeTab, setActiveTab] = useState('architecture');
+
+  const architecture = {
+    phases: [
+      {
+        name: 'Data Preprocessing',
+        icon: <FileText className="w-6 h-6" />,
+        color: 'bg-blue-500',
+        steps: ['PDF Loading', 'Watermark Removal', 'Layout Analysis', 'Page Segmentation']
+      },
+      {
+        name: 'Extraction Module',
+        icon: <Layers className="w-6 h-6" />,
+        color: 'bg-green-500',
+        steps: ['Table Detection', 'Cell Recognition', 'Formula Extraction', 'Image Extraction']
+      },
+      {
+        name: 'Post-processing',
+        icon: <Database className="w-6 h-6" />,
+        color: 'bg-purple-500',
+        steps: ['Markdown Conversion', 'LaTeX Formatting', 'Structure Validation', 'Index Building']
+      },
+      {
+        name: 'QA System',
+        icon: <Search className="w-6 h-6" />,
+        color: 'bg-orange-500',
+        steps: ['Question Parsing', 'Context Retrieval', 'Answer Selection', 'Multi-answer Detection']
+      }
+    ]
+  };
+
+  const projectStructure = `project/
+├── main.py                      # Entry point cho toàn bộ pipeline
+├── requirements.txt             # Dependencies
+├── config/
+│   ├── extract_config.yaml     # Config cho extraction
+│   └── qa_config.yaml          # Config cho QA
+│
+├── models/
+│   ├── checkpoints/            # Model weights
+│   ├── extraction/
+│   │   ├── table_detector.py  # Table detection model (<4B params)
+│   │   ├── text_recognizer.py # OCR/Text recognition
+│   │   └── layout_parser.py   # Layout analysis
+│   └── qa/
+│       ├── retriever.py        # Document retriever
+│       └── answerer.py         # Answer selection model (<4B params)
+│
+├── preprocessing/
+│   ├── pdf_loader.py           # Load và parse PDF
+│   ├── watermark_remover.py   # Xử lý watermark
+│   ├── page_segmenter.py      # Phân đoạn trang
+│   └── image_processor.py     # Xử lý hình ảnh
+│
+├── extraction/
+│   ├── table_extractor.py     # Trích xuất bảng
+│   ├── formula_extractor.py   # Trích xuất công thức
+│   ├── text_extractor.py      # Trích xuất văn bản
+│   └── merge_cell_handler.py  # Xử lý merged cells
+│
+├── postprocessing/
+│   ├── markdown_converter.py  # Convert sang Markdown
+│   ├── latex_formatter.py     # Format công thức LaTeX
+│   ├── html_table_builder.py  # Build HTML tables
+│   └── validator.py           # Validate output
+│
+├── qa/
+│   ├── indexer.py             # Build search index (local)
+│   ├── retriever.py           # Retrieve relevant context
+│   ├── question_parser.py     # Parse questions from CSV
+│   └── answer_selector.py     # Select answers
+│
+├── utils/
+│   ├── file_handler.py        # I/O operations
+│   ├── logger.py              # Logging
+│   └── metrics.py             # Evaluation metrics
+│
+├── scripts/
+│   ├── run_extract.sh         # Script chạy extraction
+│   ├── run_choose_answer.sh   # Script chạy QA
+│   └── evaluate.sh            # Script đánh giá
+│
+└── data/
+    ├── augmented/             # Augmented training data
+    └── cache/                 # Cache cho tốc độ`;
+
+  const modelSuggestions = [
+    {
+      task: 'Table Detection & Structure Recognition',
+      models: [
+        'TableTransformer (< 1B params) - Microsoft',
+        'DETR variants (< 1B params) - Facebook',
+        'LayoutLMv3-base (< 400M params)'
+      ]
+    },
+    {
+      task: 'Text Recognition (OCR)',
+      models: [
+        'TrOCR-small (< 400M params)',
+        'PARSeq-small (< 100M params)',
+        'EasyOCR (lightweight models)'
+      ]
+    },
+    {
+      task: 'Document Retrieval',
+      models: [
+        'MiniLM-L6 (< 100M params) - Sentence embeddings',
+        'BGE-small (< 400M params) - Chinese/English',
+        'PhoBERT-base (< 150M params) - Vietnamese'
+      ]
+    },
+    {
+      task: 'Answer Selection',
+      models: [
+        'DeBERTa-v3-small (< 500M params)',
+        'ELECTRA-small (< 200M params)',
+        'DistilBERT (< 100M params)'
+      ]
+    }
+  ];
+
+  const pipeline = [
+    {
+      stage: 'Stage 1: Extraction Pipeline',
+      steps: [
+        '1. Load PDF → PyMuPDF/pdfplumber',
+        '2. Remove watermark → Image processing',
+        '3. Detect layout → LayoutParser/DETR',
+        '4. Extract tables → TableTransformer',
+        '5. Extract formulas → LaTeX-OCR',
+        '6. Extract images → Save as |<image_n>|',
+        '7. Convert to Markdown → Custom converter',
+        '8. Validate structure → Quality checks'
+      ]
+    },
+    {
+      stage: 'Stage 2: Indexing',
+      steps: [
+        '1. Parse extracted MD files',
+        '2. Chunk documents (tables, sections)',
+        '3. Generate embeddings → MiniLM/BGE',
+        '4. Build local index → FAISS/Annoy',
+        '5. Store metadata → JSON/SQLite'
+      ]
+    },
+    {
+      stage: 'Stage 3: QA Pipeline',
+      steps: [
+        '1. Load questions from CSV',
+        '2. Parse question + options',
+        '3. Retrieve relevant chunks → Vector search',
+        '4. Score each option → QA model',
+        '5. Select answers (multi-label)',
+        '6. Format output → answer.md'
+      ]
+    }
+  ];
+
+  const technicalApproach = [
+    {
+      component: 'Table Extraction',
+      approach: 'Two-stage: (1) Detection với DETR-based model, (2) Cell recognition với grid-based approach + OCR',
+      challenges: 'Merged cells, multi-page tables, complex headers',
+      solution: 'Template matching + rule-based post-processing cho merged cells'
+    },
+    {
+      component: 'Formula Extraction',
+      approach: 'LaTeX-OCR hoặc Pix2Tex cho công thức math',
+      challenges: 'Inline vs display formulas, special symbols',
+      solution: 'Combine OCR với regex patterns cho validation'
+    },
+    {
+      component: 'Multi-language Support',
+      approach: 'Use multilingual models (LayoutLMv3, mBERT variants)',
+      challenges: 'Vietnamese technical terms + English mixed',
+      solution: 'Fine-tune trên technical domain data'
+    },
+    {
+      component: 'QA System',
+      approach: 'Retrieval + Re-ranking: Vector search → Score options với QA model',
+      challenges: 'Multiple correct answers, table-based questions',
+      solution: 'Threshold-based multi-label classification'
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            PDF Technical Document Extraction & QA Pipeline
+          </h1>
+          <p className="text-gray-300">Complete system design cho Task 2 - Open Source Models (&lt;4B params)</p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {['architecture', 'structure', 'models', 'pipeline', 'approach'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                activeTab === tab
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-800 text-gray-300 hover:bg-slate-700'
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Architecture Overview */}
+        {activeTab === 'architecture' && (
+          <div className="space-y-6">
+            <div className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <GitBranch className="w-6 h-6 text-blue-400" />
+                Pipeline Architecture
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {architecture.phases.map((phase, idx) => (
+                  <div key={idx} className="bg-slate-900/50 rounded-lg p-4 border border-slate-600">
+                    <div className={`${phase.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3`}>
+                      {phase.icon}
+                    </div>
+                    <h3 className="font-bold text-lg mb-3">{phase.name}</h3>
+                    <ul className="space-y-1 text-sm text-gray-300">
+                      {phase.steps.map((step, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-blue-400 mt-1">→</span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <PlayCircle className="w-5 h-5 text-green-400" />
+                Execution Flow
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 p-3 bg-slate-900/50 rounded-lg">
+                  <div className="bg-blue-600 px-3 py-1 rounded text-sm font-mono">run_extract.sh</div>
+                  <span className="text-gray-400">→</span>
+                  <span className="text-gray-300">PDF → Preprocessing → Extraction → Markdown + Images</span>
+                </div>
+                <div className="flex items-center gap-4 p-3 bg-slate-900/50 rounded-lg">
+                  <div className="bg-orange-600 px-3 py-1 rounded text-sm font-mono">run_choose_answer.sh</div>
+                  <span className="text-gray-400">→</span>
+                  <span className="text-gray-300">Questions.csv → Indexing → Retrieval → Answer Selection</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Project Structure */}
+        {activeTab === 'structure' && (
+          <div className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <Folder className="w-6 h-6 text-blue-400" />
+              Project Structure
+            </h2>
+            <pre className="bg-slate-900 p-4 rounded-lg overflow-x-auto text-sm text-green-400 font-mono">
+              {projectStructure}
+            </pre>
+          </div>
+        )}
+
+        {/* Model Suggestions */}
+        {activeTab === 'models' && (
+          <div className="space-y-4">
+            <div className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Settings className="w-6 h-6 text-blue-400" />
+                Recommended Models (&lt;4B Parameters)
+              </h2>
+              <div className="space-y-4">
+                {modelSuggestions.map((item, idx) => (
+                  <div key={idx} className="bg-slate-900/50 rounded-lg p-4 border border-slate-600">
+                    <h3 className="font-bold text-lg mb-3 text-blue-400">{item.task}</h3>
+                    <ul className="space-y-2">
+                      {item.models.map((model, i) => (
+                        <li key={i} className="flex items-start gap-2 text-gray-300">
+                          <CheckSquare className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
+                          <span>{model}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pipeline Steps */}
+        {activeTab === 'pipeline' && (
+          <div className="space-y-4">
+            {pipeline.map((stage, idx) => (
+              <div key={idx} className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
+                <h3 className="text-xl font-bold mb-4 text-blue-400">{stage.stage}</h3>
+                <div className="space-y-2">
+                  {stage.steps.map((step, i) => (
+                    <div key={i} className="flex items-start gap-3 p-2 hover:bg-slate-700/30 rounded transition-colors">
+                      <div className="bg-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">
+                        {i + 1}
+                      </div>
+                      <span className="text-gray-300">{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Technical Approach */}
+        {activeTab === 'approach' && (
+          <div className="space-y-4">
+            {technicalApproach.map((item, idx) => (
+              <div key={idx} className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
+                <h3 className="text-xl font-bold mb-3 text-purple-400">{item.component}</h3>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-blue-400 font-semibold">Approach:</span>
+                    <p className="text-gray-300 mt-1">{item.approach}</p>
+                  </div>
+                  <div>
+                    <span className="text-orange-400 font-semibold">Challenges:</span>
+                    <p className="text-gray-300 mt-1">{item.challenges}</p>
+                  </div>
+                  <div>
+                    <span className="text-green-400 font-semibold">Solution:</span>
+                    <p className="text-gray-300 mt-1">{item.solution}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Key Implementation Notes */}
+        <div className="mt-8 bg-gradient-to-r from-blue-900/50 to-purple-900/50 backdrop-blur rounded-xl p-6 border border-blue-700">
+          <h3 className="text-xl font-bold mb-4 text-yellow-400">⚠️ Critical Implementation Notes</h3>
+          <ul className="space-y-2 text-gray-200">
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-400">•</span>
+              <span><strong>Local processing only:</strong> Không dùng external databases, tất cả index/cache phải local (RAM/file)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-400">•</span>
+              <span><strong>Model size limit:</strong> Mỗi model &lt;4B parameters - có thể dùng nhiều models nhỏ</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-400">•</span>
+              <span><strong>Multi-page tables:</strong> Implement logic để merge tables across pages dựa vào header matching</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-400">•</span>
+              <span><strong>Data augmentation:</strong> Generate synthetic examples từ training data (rotate, noise, scaling)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-yellow-400">•</span>
+              <span><strong>Multi-answer QA:</strong> Use sigmoid activation (not softmax) cho multi-label classification</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PipelineDesign;
