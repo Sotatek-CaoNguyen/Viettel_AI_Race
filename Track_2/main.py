@@ -5,18 +5,14 @@ import argparse
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Sequence
+from typing import List, Sequence
 
 import pandas as pd
 from tqdm import tqdm
 
-from extraction.formula_extractor import extract_formulas
-from extraction.table_extractor import extract_tables
-from extraction.text_extractor import extract_paragraphs
-from postprocessing.markdown_converter import to_markdown
-from postprocessing.validator import validate
-from preprocessing.pdf_loader import load_pdf_paths, open_pdf
+from preprocessing.pdf_loader import load_pdf_paths
 from qa.answer_selector import select_answers
+from extraction.structured_extractor import extract_pdf_to_markdown
 from qa.indexer import VectorIndex, build_index
 from qa.question_parser import parse_questions
 from qa.retriever import retrieve
@@ -80,57 +76,16 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def extract_single_pdf(pdf_path: Path, output_root: Path) -> ExtractedDocument:
-    """Process a single PDF into structured markdown output."""
+    """Process a single PDF into markdown output using the advanced extractor."""
     logging.info("Extracting %s", pdf_path.name)
     document_dir = ensure_dir(output_root / pdf_path.stem)
-    images_dir = ensure_dir(document_dir / "images")
+    ensure_dir(document_dir / "images")
 
-    pages_payload: List[Dict[str, object]] = []
-    metadata: Dict[str, object] = {"title": pdf_path.stem}
-    image_counter = 1
-
-    with open_pdf(pdf_path) as pdf:
-        if pdf.metadata and pdf.metadata.get("Title"):
-            metadata["title"] = pdf.metadata["Title"]
-
-        for page in pdf.pages:
-            paragraphs = extract_paragraphs(page)
-            tables = extract_tables(page)
-            formulas = extract_formulas(page)
-
-            images: List[str] = []
-            for _ in (getattr(page, "images", []) or []):
-                image_name = f"image{image_counter}.jpeg"
-                image_path = images_dir / image_name
-                if not image_path.exists():
-                    image_path.write_bytes(b"Placeholder image generated during extraction.\n")
-                images.append(f"images/{image_name}")
-                image_counter += 1
-
-            pages_payload.append(
-                {
-                    "page_number": page.page_number,
-                    "paragraphs": paragraphs,
-                    "tables": tables,
-                    "formulas": formulas,
-                    "images": images,
-                }
-            )
-
-    structured_document: Dict[str, object] = {
-        "document_name": pdf_path.stem,
-        "metadata": metadata,
-        "pages": pages_payload,
-    }
-
-    warnings = validate(structured_document)
-    for warning in warnings:
-        logging.warning("%s: %s", pdf_path.name, warning)
-
-    markdown_content = to_markdown(structured_document)
+    markdown_content = extract_pdf_to_markdown(pdf_path, document_dir)
     markdown_path = document_dir / "main.md"
     write_text(markdown_path, markdown_content)
 
+    warnings: List[str] = []
     return ExtractedDocument(
         name=pdf_path.stem,
         markdown_path=markdown_path,
