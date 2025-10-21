@@ -9,7 +9,7 @@ python -m main --stage qa --input_dir data/output --output_dir data/output --que
 # evaluate (kiểm tra answer.md)
 python -m main --stage evaluate --output_dir data/output
 
-`project/
+```project/
 ├── main.py                      # Entry point cho toàn bộ pipeline
 ├── requirements.txt             # Dependencies
 ├── config/
@@ -63,4 +63,4 @@ python -m main --stage evaluate --output_dir data/output
 └── data/
     ├── augmented/             # Augmented training data
     └── cache/                 # Cache cho tốc độ`;
-    
+```
