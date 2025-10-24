@@ -29,3 +29,4 @@ def remove_watermarks(page_image: Any) -> Any:
         return cleaned
 
     return page_image
+

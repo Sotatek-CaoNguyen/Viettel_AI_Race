@@ -5,11 +5,8 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterable, Iterator, List
 
-try:
-    import pdfplumber  # type: ignore
-except ImportError:  # pragma: no cover - optional dependency
-    pdfplumber = None
 
+import pdfplumber  # type: ignore
 
 @contextmanager
 def open_pdf(path: str | Path) -> Iterator["pdfplumber.PDF"]:
